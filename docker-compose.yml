@@ -1,0 +1,138 @@
+services:
+
+  slurm-controller:
+    image: slurm-base
+    container_name: slurm-controller
+    hostname: controller
+    environment:
+      - ROLE=controller
+    volumes:
+      - ./slurm.conf:/etc/slurm/slurm.conf
+      - ./munge.key:/etc/munge/munge.key
+    networks:
+      slurm-net:
+        ipv4_address: 172.30.0.2
+
+  compute1:
+    image: slurm-base
+    container_name: compute1
+    hostname: compute1
+    environment:
+      - ROLE=compute
+    volumes:
+      - ./slurm.conf:/etc/slurm/slurm.conf
+      - ./munge.key:/etc/munge/munge.key
+    networks:
+      slurm-net:
+        ipv4_address: 172.30.0.3
+
+  compute2:
+    image: slurm-base
+    container_name: compute2
+    hostname: compute2
+    environment:
+      - ROLE=compute
+    volumes:
+      - ./slurm.conf:/etc/slurm/slurm.conf
+      - ./munge.key:/etc/munge/munge.key
+    networks:
+      slurm-net:
+        ipv4_address: 172.30.0.4
+
+  compute3:
+    image: slurm-base
+    container_name: compute3
+    hostname: compute3
+    environment:
+      - ROLE=compute
+    volumes:
+      - ./slurm.conf:/etc/slurm/slurm.conf
+      - ./munge.key:/etc/munge/munge.key
+    networks:
+      slurm-net:
+        ipv4_address: 172.30.0.5
+
+  compute4:
+    image: slurm-base
+    container_name: compute4
+    hostname: compute4
+    environment:
+      - ROLE=compute
+    volumes:
+      - ./slurm.conf:/etc/slurm/slurm.conf
+      - ./munge.key:/etc/munge/munge.key
+    networks:
+      slurm-net:
+        ipv4_address: 172.30.0.6
+
+  mariadb:
+    image: mariadb:10.5
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: slurmroot
+      MYSQL_DATABASE: slurm_acct_db
+      MYSQL_USER: slurm
+      MYSQL_PASSWORD: slurmdbpass
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks:
+      slurm-net:
+        ipv4_address: 172.30.0.10
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  slurmdbd:
+    image: slurm-base
+    container_name: slurmdbd
+    hostname: slurmdbd
+    restart: on-failure
+    environment:
+      - ROLE=slurmdbd
+    volumes:
+      - ./slurmdbd.conf:/etc/slurm/slurmdbd.conf
+      - ./munge.key:/etc/munge/munge.key
+    networks:
+      slurm-net:
+        ipv4_address: 172.30.0.11
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+  slurmrestd:
+    image: slurm-base
+    container_name: slurmrestd
+    hostname: slurmrestd
+    environment:
+      - ROLE=rest
+    ports:
+      - "6820:6820"
+    volumes:
+      - ./slurm.conf:/etc/slurm/slurm.conf
+      - ./munge.key:/etc/munge/munge.key
+    networks:
+      slurm-net:
+        ipv4_address: 172.30.0.12
+    depends_on:
+      - slurm-controller
+      - slurmdbd
+    cap_add:
+      - SYS_ADMIN
+      - IPC_LOCK
+    security_opt:
+      - seccomp=unconfined
+
+volumes:
+  mariadb-data:
+
+networks:
+  slurm-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
