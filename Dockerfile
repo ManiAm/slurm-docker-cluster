@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     mariadb-client \
+    libdbus-1-dev \
     wget \
     libhwloc-dev \
     libnuma-dev \

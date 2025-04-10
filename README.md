@@ -2,6 +2,8 @@
 
 This project sets up a complete [Slurm](https://slurm.schedmd.com/) cluster using Docker containers for local development, experimentation, and testing purposes.
 
+This is tested on "Ubuntu 20.04.6".
+
 ## Components
 
 The Slurm cluster consists of:
