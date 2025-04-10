@@ -20,7 +20,6 @@ services:
     environment:
       - ROLE=compute
     volumes:
-      - ./slurm.conf:/etc/slurm/slurm.conf
       - ./munge.key:/etc/munge/munge.key
     networks:
       slurm-net:
@@ -33,7 +32,6 @@ services:
     environment:
       - ROLE=compute
     volumes:
-      - ./slurm.conf:/etc/slurm/slurm.conf
       - ./munge.key:/etc/munge/munge.key
     networks:
       slurm-net:
@@ -46,7 +44,6 @@ services:
     environment:
       - ROLE=compute
     volumes:
-      - ./slurm.conf:/etc/slurm/slurm.conf
       - ./munge.key:/etc/munge/munge.key
     networks:
       slurm-net:
@@ -59,7 +56,6 @@ services:
     environment:
       - ROLE=compute
     volumes:
-      - ./slurm.conf:/etc/slurm/slurm.conf
       - ./munge.key:/etc/munge/munge.key
     networks:
       slurm-net:

@@ -19,7 +19,7 @@ case "$ROLE" in
     ;;
   compute)
     echo "Starting slurmd..."
-    su -s /bin/bash slurm -c "/usr/sbin/slurmd -D -vvvv"
+    su -s /bin/bash slurm -c "/usr/sbin/slurmd -D -vvvv --conf-server=slurm-controller"
     ;;
   slurmdbd)
     echo "Starting slurmdbd..."
