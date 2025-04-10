@@ -39,11 +39,11 @@ Install the munge package on the host:
 
 Generate a munge key:
 
-    sudo create-munge-key
+    cd slurm-docker-cluster/
+    sudo ./create-munge-key
 
 Copy the key to the current project directory:
 
-    cd slurm-docker-cluster/
     sudo cp /etc/munge/munge.key ./munge.key
 
 Set the correct ownership for munge.key:
