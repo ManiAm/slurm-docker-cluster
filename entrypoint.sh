@@ -10,8 +10,6 @@ sleep 4
 
 case "$ROLE" in
   controller)
-
-    # Create a shared key file (the signing key)
     echo "Generating signing key..."
     su -s /bin/bash slurm -c "openssl rand -hex 32 > /etc/slurm/jwt_hs256.key"
     su -s /bin/bash slurm -c "chmod 600 /etc/slurm/jwt_hs256.key"

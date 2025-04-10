@@ -70,10 +70,10 @@ services:
     container_name: mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: slurmroot
       MYSQL_DATABASE: slurm_acct_db
       MYSQL_USER: slurm
       MYSQL_PASSWORD: slurmdbpass
+      MYSQL_ROOT_PASSWORD: slurmroot
     volumes:
       - mariadb-data:/var/lib/mysql
     networks:
