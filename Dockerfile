@@ -40,8 +40,12 @@ RUN useradd -r -g slurm -d /var/lib/slurm -s /bin/bash slurm
 # Set working directory
 WORKDIR /opt
 
+ARG SLURM_VERSION=24.11.3
+ENV SLURM_VERSION=${SLURM_VERSION}
+
+RUN echo "Building Slurm version ${SLURM_VERSION}"
+
 # Clone and build Slurm from source
-ENV SLURM_VERSION=24.11.3
 RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
     tar -xjf slurm-${SLURM_VERSION}.tar.bz2 && \
     cd slurm-${SLURM_VERSION} && \

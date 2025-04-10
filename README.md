@@ -59,7 +59,7 @@ Set the correct ownership and permission for slurmdbd.conf:
 
 Build the Docker image:
 
-    docker build -t slurm-base .
+    docker build --build-arg SLURM_VERSION=24.11.3 -t slurm-base .
 
 Start all the containers:
 
