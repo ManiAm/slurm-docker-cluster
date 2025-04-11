@@ -45,7 +45,7 @@ ENV SLURM_VERSION=${SLURM_VERSION}
 
 RUN echo "Building Slurm version ${SLURM_VERSION}"
 
-# Clone and build Slurm from source
+# Download and build Slurm from source
 RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
     tar -xjf slurm-${SLURM_VERSION}.tar.bz2 && \
     cd slurm-${SLURM_VERSION} && \

@@ -61,6 +61,18 @@ services:
       slurm-net:
         ipv4_address: 172.30.0.6
 
+  compute5:
+    image: slurm-base
+    container_name: compute5
+    hostname: compute5
+    environment:
+      - ROLE=compute
+    volumes:
+      - ./munge.key:/etc/munge/munge.key
+    networks:
+      slurm-net:
+        ipv4_address: 172.30.0.7
+  
   mariadb:
     image: mariadb:10.5
     container_name: mariadb

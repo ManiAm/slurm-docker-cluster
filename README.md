@@ -9,7 +9,7 @@ This is tested on "Ubuntu 20.04.6".
 The Slurm cluster consists of:
 
 - 1 controller node (slurmctld)
-- 4 compute nodes (slurmd)
+- 5 compute nodes (slurmd)
 - 1 SlurmDBD node (slurmdbd)
 - 1 MariaDB node for accounting backend
 - 1 REST API node (slurmrestd) to interact with the cluster via REST
@@ -73,8 +73,11 @@ Display the current state of nodes and partitions in the cluster:
 
     sinfo
 
-    PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
-    debug*       up   infinite      4   idle compute[1-4]
+    PARTITION AVAIL  TIMELIMIT  NODES  STATE  NODELIST
+    debug*       up  1:00:00      2    idle   compute[1-2]
+    batch        up  1-00:00:00   2    idle   compute[3-4]
+    gpu          up  2-00:00:00   1    idle   compute5
+    all          up  infinite     5    idle   compute[1-5]
 
 ## Slurm REST
 
