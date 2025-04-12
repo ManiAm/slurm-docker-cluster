@@ -72,6 +72,12 @@ RUN mkdir -p /var/log/slurm /var/spool/slurmd /var/spool/slurmctld /var/run/slur
 RUN mkdir -p /etc/munge /var/log/munge /var/lib/munge /run/munge && \
     chown -R slurm:slurm /etc/munge /var/log/munge /var/lib/munge /run/munge
 
+# Create /etc/slurm/cgroup.conf with cgroup settings
+RUN mkdir -p /etc/slurm && \
+    echo "ConstrainCores=yes"        >> /etc/slurm/cgroup.conf && \
+    echo "ConstrainRAMSpace=yes"     >> /etc/slurm/cgroup.conf && \
+    echo "ConstrainDevices=no"       >> /etc/slurm/cgroup.conf
+
 # Copy entrypoint
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
