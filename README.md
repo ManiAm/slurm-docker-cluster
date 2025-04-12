@@ -14,6 +14,10 @@ The Slurm cluster consists of:
 - 1 MariaDB node for accounting backend
 - 1 REST API node (slurmrestd) to interact with the cluster via REST
 
+The `/shared` directory is a shared volume mounted across all nodes in the Slurm cluster.
+
+It is used to share configuration files, binaries, and other data that need to be accessible from multiple nodes.
+
 The project structure looks like this:
 
     slurm-docker-cluster/
@@ -23,6 +27,11 @@ The project structure looks like this:
     ├── slurmdbd.conf
     ├── munge.key
     ├── docker-compose.yml
+
+Set the correct ownership and permission for slurmdbd.conf:
+
+    sudo chown 999:999 slurmdbd.conf
+    sudo chmod 600 slurmdbd.conf
 
 ## Authentication
 
@@ -51,11 +60,6 @@ Set the correct ownership for munge.key:
     sudo chown 999:999 munge.key
 
 ## Build and Lunch
-
-Set the correct ownership and permission for slurmdbd.conf:
-
-    sudo chown 999:999 slurmdbd.conf
-    sudo chmod 600 slurmdbd.conf
 
 Build the Docker image:
 
@@ -262,6 +266,116 @@ The others will be throttled/stalled due to the cgroup constraint.
 
 <img src="pics/slurm_stress_2.jpg" alt="segment" width="700">
 
+## Slurm and MPI
+
+MPI (Message Passing Interface) is a standardized and portable communication protocol used to program parallel applications that run across multiple nodes.
+
+It allows processes to communicate with one another by sending and receiving messages, making it ideal for high-performance computing (HPC) tasks.
+
+Slurm integrates seamlessly with MPI to run distributed parallel applications across multiple nodes in a cluster.
+
+Slurm handles resource allocation and job scheduling, while MPI handles inter-process communication.
+
+`MpiDefault` parameter tells Slurm which MPI type to use by default when launching jobs with srun:
+
+| Value       | Description                                                                   |
+|-------------|-------------------------------------------------------------------------------|
+| none        | No special support for MPI. Slurm will not handle MPI-specific startup tasks. |
+| openmpi     | Legacy OpenMPI support (rarely needed with newer versions).                   |
+| pmi2        | Use PMI2 interface (common with OpenMPI and MPICH).                           |
+| hydra       | For Intel MPI or MPICH with Hydra process manager.                            |
+| cray_shasta | Special plugin for Cray Shasta systems.                                       |
+| pmix        | Use PMIx interface (more scalable and modern).                                |
+
+OpenMPI is a popular open-source implementation of the MPI standard, providing tools and libraries that support a variety of platforms and interconnects.
+
+It is widely used in research and industry for building scalable applications that require efficient communication among distributed processes.
+
+Let's walk through an example to demonstrate how OpenMPI can be used within a Slurm-managed environment.
+
+Open an interactive shell to the head node:
+
+```bash
+docker exec -it slurm-controller bash
+```
+
+From the `debug` partition, request two physical node for an hour:
+
+```bash
+salloc --partition=debug --nodes=2 --time=01:00:00 --job-name=mpi-testing
+
+salloc: Granted job allocation 1
+salloc: Nodes compute[1-2] are ready for job
+```
+
+Install OpenMPI packages on all reserved compute nodes:
+
+```bash
+srun bash -c 'apt-get update && apt install openmpi-bin openmpi-common libopenmpi-dev -y'
+```
+
+Open a shell on compute1:
+
+```bash
+srun --nodelist=compute1 --pty bash
+```
+
+Go to the shared folder that is accessible across all Slurm cluster:
+
+```bash
+cd /shared
+```
+
+Create `hello_mpi.c` file:
+
+```bash
+nano hello_mpi.c
+```
+
+With this content:
+
+```C
+#include <stdio.h>
+#include <mpi.h>
+
+int main(int argc, char** argv) {
+    int node, total;
+
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &node);
+    MPI_Comm_size(MPI_COMM_WORLD, &total);
+    printf("Hello World from Node %d of %d!\n", node, total);
+    MPI_Finalize();
+    return 0;
+}
+```
+
+Compile the MPI program:
+
+```bash
+mpicc hello_mpi.c -o hello_mpi
+```
+
+This produces an executable called `hello_mpi`.
+
+Return to the controller node:
+
+```bash
+exit
+```
+
+Instead of using `mpirun`, Slurm recommends using `srun` to launch MPI programs.
+
+It enables better job tracking, process binding, and scalability through direct integration with process management interfaces like PMI and PMIx.
+
+Invoke the `hello_mpi` program:
+
+```bash
+srun /shared/hello_mpi
+
+Hello World from Node 1 of 2!
+Hello World from Node 0 of 2!
+```
 
 ## Slurm REST
 

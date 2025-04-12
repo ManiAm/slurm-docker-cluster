@@ -30,13 +30,16 @@ RUN apt-get update && apt-get install -y \
     libmariadb-dev-compat \
     mariadb-client \
     libdbus-1-dev \
+    hwloc \
     libhwloc-dev \
     libnuma-dev \
     liblz4-dev \
     libjson-c-dev \
     libjwt-dev \
     libhttp-parser-dev \
-    libyaml-dev
+    libyaml-dev \
+    libevent-dev \
+    libpmix-dev
 
 # Add slurm group and user
 RUN groupadd -r slurm && \
@@ -60,7 +63,7 @@ RUN wget https://download.schedmd.com/slurm/slurm-${SLURM_VERSION}.tar.bz2 && \
 
 # Build and install Slurm
 RUN cd slurm-${SLURM_VERSION} && \
-    ./configure --prefix=/usr --sysconfdir=/etc/slurm --with-munge --with-hwloc --with-json --with-http-parser --with-jwt --enable-slurmrestd --enable-multiple-slurmd && \
+    ./configure --prefix=/usr --sysconfdir=/etc/slurm --with-munge --with-hwloc --with-json --with-http-parser --with-jwt --enable-slurmrestd --enable-multiple-slurmd --with-pmix && \
     make -j$(nproc) && \
     make install
 
