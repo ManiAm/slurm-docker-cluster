@@ -79,6 +79,117 @@ Display the current state of nodes and partitions in the cluster:
     gpu          up  2-00:00:00   1    idle   compute5
     all          up  infinite     5    idle   compute[1-5]
 
+## Interactive Job
+
+Open an interactive shell to the controller node:
+
+    docker exec -it slurm-controller bash
+
+Request an interactive allocation:
+
+```bash
+salloc --partition=debug --nodes=2 --time=01:00:00
+
+salloc: Granted job allocation 1
+salloc: Nodes compute[1-2] are ready for job
+```
+
+Create a Python script (hello.py):
+
+```bash
+nano hello.py
+```
+
+```python
+#!/usr/bin/env python3
+
+import socket
+print(f"Hello from {socket.gethostname()}")
+```
+
+This script prints the hostname of the node it's running on — a nice way to verify it's distributed correctly.
+
+Make it executable:
+
+```bash
+chmod 755 hello.py
+```
+
+Distribute the script to all compute nodes using `sbcast`:
+
+```bash
+sbcast hello.py /tmp/hello.py
+```
+
+This sends your local `hello.py` file to `/tmp/hello.py` on both compute nodes, so each task can access it locally.
+
+`sbcast` is much faster and more efficient than using scp or a shared filesystem for small files in a distributed job.
+
+Run the script across all allocated nodes:
+
+```bash
+srun /tmp/hello.py
+
+Hello from compute2
+Hello from compute1
+```
+
+## Batch Job
+
+Create a job script `hello_job.sh`:
+
+```bash
+nano hello_job.sh
+```
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=hello_job
+#SBATCH --output=hello_output.txt
+#SBATCH --ntasks=1
+#SBATCH --time=00:01:00
+#SBATCH --partition=debug
+
+echo "Hello from $(hostname)"
+```
+
+Job script is a shell script with SBATCH directives used to submit batch jobs.
+
+Submit it with sbatch:
+
+```bash
+sbatch hello_job.sh
+
+Submitted batch job 25
+```
+
+You can check your job status with:
+
+```bash
+sacct -j 25 --format=JobID,JobName,State,ExitCode
+
+JobID           JobName      State ExitCode 
+------------ ---------- ---------- -------- 
+25            hello_job  COMPLETED      0:0 
+25.batch          batch  COMPLETED      0:0
+```
+
+The output file is written by the node that executes the job.
+
+Open an interactive shell to `compute1`:
+
+```bash
+docker exec -it bash compute1
+```
+
+And check the output file:
+
+```bash
+ls -l /root
+
+-rw-r--r-- 1 root root 20 Apr 11 23:21 hello_output.txt
+```
+
 ## Slurm REST
 
 We are exposing slurmrestd on port 6820, so REST requests should go to:
