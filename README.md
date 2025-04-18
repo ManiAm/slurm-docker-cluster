@@ -111,7 +111,7 @@ import socket
 print(f"Hello from {socket.gethostname()}")
 ```
 
-This script prints the hostname of the node it's running on — a nice way to verify it's distributed correctly.
+This script prints the hostname of the node it's running on - a nice way to verify it's distributed correctly.
 
 Make it executable:
 
