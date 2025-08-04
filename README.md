@@ -2,21 +2,9 @@
 
 This project sets up a complete [Slurm](https://slurm.schedmd.com/) cluster using Docker containers for local development, experimentation, and testing purposes.
 
-This is tested on "Ubuntu 20.04.6".
+> This is tested on "Ubuntu 20.04.6".
 
 ## Components
-
-The Slurm cluster consists of:
-
-- 1 controller node (slurmctld)
-- 5 compute nodes (slurmd)
-- 1 SlurmDBD node (slurmdbd)
-- 1 MariaDB node for accounting backend
-- 1 REST API node (slurmrestd) to interact with the cluster via REST
-
-The `/shared` directory is a shared volume mounted across all nodes in the Slurm cluster.
-
-It is used to share configuration files, binaries, and other data that need to be accessible from multiple nodes.
 
 The project structure looks like this:
 
@@ -28,18 +16,19 @@ The project structure looks like this:
     ├── munge.key
     ├── docker-compose.yml
 
-Set the correct ownership and permission for slurmdbd.conf:
+The Slurm cluster consists of:
 
-    sudo chown 999:999 slurmdbd.conf
-    sudo chmod 600 slurmdbd.conf
+- 1 controller node (slurmctld)
+- 5 compute nodes (slurmd)
+- 1 SlurmDBD node (slurmdbd)
+- 1 MariaDB node for accounting backend
+- 1 REST API node (slurmrestd) to interact with the cluster via REST
+
+The `/shared` directory is a shared volume mounted across all nodes in the Slurm cluster. It is used to share configuration files, binaries, and other data that need to be accessible from multiple nodes.
 
 ## Authentication
 
-`MUNGE` is a lightweight authentication service used by Slurm to securely verify users across nodes.
-
-All nodes in the cluster need to share the same MUNGE key (usually at /etc/munge/munge.key).
-
-It ensures that jobs submitted from one node are trusted and accepted by the controller.
+`MUNGE` is a lightweight authentication service used by Slurm to securely verify users across nodes. All nodes in the cluster need to share the same MUNGE key (usually at /etc/munge/munge.key). It ensures that jobs submitted from one node are trusted and accepted by the controller.
 
 Install the munge package on the host:
 
@@ -60,6 +49,11 @@ Set the correct ownership for munge.key:
     sudo chown 999:999 munge.key
 
 ## Build and Lunch
+
+Set the correct ownership and permission for slurmdbd.conf:
+
+    sudo chown 999:999 slurmdbd.conf
+    sudo chmod 600 slurmdbd.conf
 
 Build the Docker image:
 
@@ -172,9 +166,9 @@ You can check your job status with:
 ```bash
 sacct -j 25 --format=JobID,JobName,State,ExitCode
 
-JobID           JobName      State ExitCode 
------------- ---------- ---------- -------- 
-25            hello_job  COMPLETED      0:0 
+JobID           JobName      State ExitCode
+------------ ---------- ---------- --------
+25            hello_job  COMPLETED      0:0
 25.batch          batch  COMPLETED      0:0
 ```
 
@@ -196,13 +190,9 @@ ls -l /root
 
 ## Job Enforcement
 
-By default, Slurm allocates resources like CPUs and memory based on job requests but does not strictly prevent a job from exceeding these limits.
+By default, Slurm allocates resources like CPUs and memory based on job requests but does not strictly prevent a job from exceeding these limits. This means a job can potentially use more CPUs or memory than requested if the system allows it, which can impact other jobs on the same node.
 
-This means a job can potentially use more CPUs or memory than requested if the system allows it, which can impact other jobs on the same node.
-
-To ensure strict enforcement, administrators must enable and configure Linux control groups (`cgroups`) via slurm.conf and cgroup.conf.
-
-This allows Slurm to constrain CPU usage through `cpusets` and enforce memory limits, terminating jobs that exceed their allocations.
+To ensure strict enforcement, administrators must enable and configure Linux control groups (`cgroups`) via slurm.conf and cgroup.conf. This allows Slurm to constrain CPU usage through `cpusets` and enforce memory limits, terminating jobs that exceed their allocations.
 
 To enable cgroups, we need to edit the `slurm.conf` and ensure the following line is present:
 
@@ -268,15 +258,9 @@ The others will be throttled/stalled due to the cgroup constraint.
 
 ## Slurm and MPI
 
-MPI (Message Passing Interface) is a standardized and portable communication protocol used to program parallel applications that run across multiple nodes.
+MPI (Message Passing Interface) is a standardized and portable communication protocol used to program parallel applications that run across multiple nodes. It allows processes to communicate with one another by sending and receiving messages, making it ideal for high-performance computing (HPC) tasks.
 
-It allows processes to communicate with one another by sending and receiving messages, making it ideal for high-performance computing (HPC) tasks.
-
-Slurm integrates seamlessly with MPI to run distributed parallel applications across multiple nodes in a cluster.
-
-Slurm handles resource allocation and job scheduling, while MPI handles inter-process communication.
-
-`MpiDefault` parameter tells Slurm which MPI type to use by default when launching jobs with srun:
+Slurm can integrate with MPI to run distributed parallel applications across multiple nodes in a cluster. Slurm handles resource allocation and job scheduling, while MPI handles inter-process communication. `MpiDefault` parameter tells Slurm which MPI type to use by default when launching jobs with srun:
 
 | Value       | Description                                                                   |
 |-------------|-------------------------------------------------------------------------------|
@@ -287,11 +271,7 @@ Slurm handles resource allocation and job scheduling, while MPI handles inter-pr
 | cray_shasta | Special plugin for Cray Shasta systems.                                       |
 | pmix        | Use PMIx interface (more scalable and modern).                                |
 
-OpenMPI is a popular open-source implementation of the MPI standard, providing tools and libraries that support a variety of platforms and interconnects.
-
-It is widely used in research and industry for building scalable applications that require efficient communication among distributed processes.
-
-Let's walk through an example to demonstrate how OpenMPI can be used within a Slurm-managed environment.
+OpenMPI is a popular open-source implementation of the MPI standard, providing tools and libraries that support a variety of platforms and interconnects. It is widely used in research and industry for building scalable applications that require efficient communication among distributed processes. Let's walk through an example to demonstrate how OpenMPI can be used within a Slurm-managed environment.
 
 Open an interactive shell to the head node:
 
@@ -364,9 +344,7 @@ Return to the controller node:
 exit
 ```
 
-Instead of using `mpirun`, Slurm recommends using `srun` to launch MPI programs.
-
-It enables better job tracking, process binding, and scalability through direct integration with process management interfaces like PMI and PMIx.
+Instead of using `mpirun`, Slurm recommends using `srun` to launch MPI programs. It enables better job tracking, process binding, and scalability through direct integration with process management interfaces like PMI and PMIx.
 
 Invoke the `hello_mpi` program:
 
