@@ -3,7 +3,7 @@
 
 ## What is an HPC Cluster?
 
-Before we talk about Slurm, we have to talk about High-Performance Computing (HPC) Clusters. Imagine you have a massively complex math problem, like simulating the weather or training an AI. A standard laptop would take years to solve it. Instead, scientists use an HPC Cluster. A cluster is not one giant computer; it is hundreds or thousands of individual, highly powerful computers (called nodes) wired together to act as one massive supercomputer. Each of these nodes contains valuable resources:
+Before we talk about Slurm, we have to talk about **High-Performance Computing** (HPC) Clusters. Imagine you have a massively complex math problem, like simulating the weather or training an AI. A standard laptop would take years to solve it. Instead, scientists use an HPC Cluster. A cluster is not one giant computer; it is hundreds or thousands of individual, highly powerful computers (called nodes) wired together to act as one massive supercomputer. Each of these nodes contains valuable resources:
 
 - CPUs (the brains for general tasks)
 - GPUs (specialized chips for AI and heavy math)
@@ -11,13 +11,13 @@ Before we talk about Slurm, we have to talk about High-Performance Computing (HP
 
 ## The Need for a "Traffic Cop"
 
-Imagine a busy university where 500 different scientists all want to run massive simulations on the HPC cluster at the exact same time. If they all just tried to run their programs simultaneously, the computers would crash. Some scientists need 10 nodes for an hour; others need 1 node with 4 GPUs for three days. To keep the system fair, highly utilized, and organized, the cluster needs a "traffic cop" or a restaurant host. In the computing world, this traffic cop is called a Workload Manager (or Job Scheduler).
+Imagine a busy university where 500 different scientists all want to run massive simulations on the HPC cluster at the exact same time. If they all just tried to run their programs simultaneously, the computers would crash. Some scientists need 10 nodes for an hour; others need 1 node with 4 GPUs for three days. To keep the system fair, highly utilized, and organized, the cluster needs a "traffic cop" or a restaurant host. In the computing world, this traffic cop is called a **Workload Manager** (or Job Scheduler).
 
 [Slurm](https://slurm.schedmd.com/) is exactly that traffic cop. It is a highly popular, open-source workload manager built specifically for these massive HPC clusters. It originally stood for "Simple Linux Utility for Resource Management". However, over time, it became so advanced that it is no longer just a "simple utility". Today, the acronym is mostly ignored, and it is simply treated as a name: Slurm.
 
 ## How Slurm Works
 
-At its core, Slurm is brilliant because it separates two distinct jobs:
+At its core, Slurm separates two distinct jobs:
 
 - **Resource Allocation** (The Planning): Slurm looks at all the incoming requests (called jobs) and looks at the available computers in the cluster. Based on policies, user priorities, and availability, it decides who gets which computers, and when.
 
@@ -32,7 +32,7 @@ By separating these two steps, Slurm ensures that the cluster is constantly busy
 
 ## Who Uses Slurm?
 
-Because Slurm is so powerful and scalable, Slurm is the industry standard for high-level computing. You will find it running at:
+Slurm is the industry standard for high-level computing. You will find it running at:
 
 - Universities & Research: MIT, Stanford, and CERN (the particle physics lab).
 - Supercomputing Centers: Many of the world's fastest supercomputers on the famous "Top500" list run on Slurm.
@@ -82,7 +82,7 @@ Understanding Slurm terminology is essential to working effectively with a clust
 
 ## Slurm Components
 
-<img src="pics/slurm_arch.jpg" alt="segment" width="600">
+<img src="../pics/slurm_arch.jpg" alt="segment" width="600">
 
 | Group              | Term          | Description                                                          |
 | ------------------ | ------------- | -------------------------------------------------------------------- |
